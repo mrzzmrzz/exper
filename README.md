@@ -10,7 +10,7 @@
 
 - **Experiment Logging:** Easily log and save experiment details, parameters, and results for better reproducibility and analysis.
 
-- **Based on TorchDrug:** Exper is derived from the open-source library [TorchDrug](https://github.com/DeepGraphLearning/torchdrug/tree/master) developed by MILA, providing a foundation for reliable and robust deep learning experiments.
+- **Based on TorchDrug:** `exper` is derived from the open-source library [TorchDrug](https://github.com/DeepGraphLearning/torchdrug/tree/master) developed by MILA, providing a foundation for reliable and robust deep learning experiments.
 
 ## Installation:
 ```bash
