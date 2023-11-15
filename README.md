@@ -18,7 +18,7 @@ pip install exper==0.1.2
 ```
 
 ## License
-Exper is released under [Apache-2.0 License](https://github.com/DeepGraphLearning/torchdrug/blob/master/LICENSE).
+`exper` is released under [Apache-2.0 License](https://github.com/DeepGraphLearning/torchdrug/blob/master/LICENSE).
 
 ## Contributing
 Feel free to contribute your codes to make this package easy to use.
