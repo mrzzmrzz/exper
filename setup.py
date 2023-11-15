@@ -9,7 +9,6 @@ setup(
     name='exper',
     version='0.1.2',
     author="Mrzz",
-
     description="This is a python package for running deep learning experiments. "
                 "Users can rapidly run their experiments by importing this module.",
     packages=find_packages(),
