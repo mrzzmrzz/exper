@@ -56,7 +56,7 @@ class Engine:
 
     def __init__(self, task: nn.Module, train_set: Dataset, valid_set: Dataset, test_set: Dataset,
                  optimizer: Optimizer,  criterion: Union[str, nn.Module], is_customized_criterion: bool = False, scheduler: LRScheduler = None,
-                 gpus: Union[int, List[int], None] = None, batch_size: int = 1, num_worker: int = 0,
+                 gpus: Union[List[int], None] = None, batch_size: int = 1, num_worker: int = 0,
                  log_interval: int = 100, half_precision: bool = False):
 
         self.rank = comms.get_rank()
