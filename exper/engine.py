@@ -40,8 +40,6 @@ class Engine:
         train_set (data.Dataset): training set
         valid_set (data.Dataset): validation set
         test_set (data.Dataset): test set
-        criterion (torch.nn.modules.loss._Loss): loss function
-        is_customized_criterion (bool): whether the loss function is customized
         optimizer (optim.Optimizer): optimizer
         scheduler (lr_scheduler._LRScheduler, optional): scheduler
         gpus (list of int, optional): GPU ids. By default, CPUs will be used.
@@ -55,9 +53,8 @@ class Engine:
     """
 
     def __init__(self, task: nn.Module, train_set: Dataset, valid_set: Dataset, test_set: Dataset,
-                 optimizer: Optimizer,  criterion: Union[str, nn.Module], is_customized_criterion: bool = False, scheduler: LRScheduler = None,
-                 gpus: Union[List[int], None] = None, batch_size: int = 1, num_worker: int = 0,
-                 log_interval: int = 100, half_precision: bool = False):
+                 optimizer: Optimizer,  scheduler: LRScheduler = None, gpus: Union[List[int], None] = None,
+                 batch_size: int = 1, num_worker: int = 0, log_interval: int = 100, half_precision: bool = False):
 
         self.rank = comms.get_rank()
         self.world_size = comms.get_world_size()
@@ -99,14 +96,6 @@ class Engine:
         self.optimizer = optimizer
         self.scheduler = scheduler
 
-        # TODO: use a resolver to simplify this process
-        if not is_customized_criterion:
-            self.criterion = loss_function_resolver(criterion)
-            self.criterion_name = criterion
-        else:
-            self.criterion = criterion
-            self.criterion_name = criterion.name
-
         if self.half_precision:
             self.scaler = amp.GradScaler(enabled=True)
 
@@ -146,8 +135,7 @@ class Engine:
 
                 with torch.cuda.amp.autocast(enabled=self.half_precision):
                     # TODO: be sure to use `model` (not `self.model`) 
-                    pred = model(batch)
-                    loss = self.criterion(pred, target)
+                    loss, pred = model(batch)
 
                 if self.half_precision:
                     self.scaler.scale(loss).backward()
@@ -163,7 +151,7 @@ class Engine:
                 self.optimizer.zero_grad()
                 # TODO: Here we can add self-designed loss to update the model
                 # TODO: key: loss name (support multiple loss record)
-                cur_loss = {self.criterion_name: loss}
+                cur_loss = {self.model.loss_name: loss}
                 losses.append(cur_loss)
 
                 # Here is the DDP loss, we need to get the loss from all clusters
@@ -207,7 +195,7 @@ class Engine:
                 batch = utils.cuda(batch, device=self.device)
 
             target = model.target(batch)
-            pred = model(batch)
+            loss, pred = model(batch)
 
             preds.append(pred)
             targets.append(target)
