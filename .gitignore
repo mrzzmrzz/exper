@@ -4,7 +4,8 @@
 *.pyo
 *.gz
 *.db
-*.egg-info/
+
+exper.egg-info/
 
 # PyCharm Specific Files
 .idea/
