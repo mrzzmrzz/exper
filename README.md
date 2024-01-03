@@ -14,7 +14,7 @@
 
 ## Installation:
 ```bash
-pip install exper==0.1.2
+pip install exper
 ```
 
 ## License

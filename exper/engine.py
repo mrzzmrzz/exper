@@ -10,10 +10,7 @@ from torch.cuda import amp as amp
 from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils import data as torch_data
-from torch.utils.data import (
-    Dataset,
-    # DataLoader,
-)
+from torch.utils.data import Dataset
 
 from torch_geometric.loader import DataLoader
 import exper.core as core
@@ -52,9 +49,20 @@ class Engine:
 
     """
 
-    def __init__(self, task: nn.Module, train_set: Dataset, valid_set: Dataset, test_set: Dataset,
-                 optimizer: Optimizer,  scheduler: LRScheduler = None, gpus: Union[List[int], None] = None,
-                 batch_size: int = 1, num_worker: int = 0, log_interval: int = 100, half_precision: bool = False):
+    def __init__(  # noqa
+      self, task: nn.Module,
+      train_set: Dataset,
+      valid_set: Dataset,
+      test_set: Dataset,
+      optimizer: Optimizer,
+      scheduler: LRScheduler = None,
+      gpus: Union[List[int], None] = None,
+      batch_size: int = 1,
+      num_worker: int = 0,
+      log_interval: int = 100,
+      half_precision: bool = False,
+      **kwargs,
+    ):
 
         self.rank = comms.get_rank()
         self.world_size = comms.get_world_size()
@@ -62,6 +70,7 @@ class Engine:
         self.batch_size = batch_size
         self.num_worker = num_worker
         self.half_precision = half_precision
+        self.follow_batch = kwargs.get("follow_batch", None)
 
         if gpus is None:
             self.device = torch.device("cpu")
@@ -110,13 +119,13 @@ class Engine:
             num_epoch (int, optional): number of epochs
         """
         sampler = torch_data.DistributedSampler(self.train_set, self.world_size, self.rank)
-        dataloader = DataLoader(self.train_set, self.batch_size, sampler=sampler, num_workers=self.num_worker)
+        dataloader = DataLoader(self.train_set, self.batch_size, sampler=sampler,
+                                num_workers=self.num_worker, follow_batch=self.follow_batch)
         model = self.model
 
         if self.world_size > 1:
             if self.device.type == "cuda":
-                model = nn.parallel.DistributedDataParallel(model, device_ids=[self.device],
-                                                            find_unused_parameters=True)
+                model = nn.parallel.DistributedDataParallel(model, device_ids=[self.device], find_unused_parameters=True)
             else:
                 model = nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
 
@@ -130,11 +139,11 @@ class Engine:
                 if self.device.type == "cuda":
                     batch = utils.cuda(batch, device=self.device)
 
-                # DDP warp the original model so use the `self.model` to get label 
+                # DDP warp the original model so use the `self.model` to get label
                 target = self.model.target(batch)
 
                 with torch.cuda.amp.autocast(enabled=self.half_precision):
-                    # TODO: be sure to use `model` (not `self.model`) 
+                    # TODO: be sure to use `model` (not `self.model`)
                     loss, pred = model(batch)
 
                 if self.half_precision:
@@ -183,7 +192,8 @@ class Engine:
         test_set = getattr(self, "%s_set" % split)
 
         sampler = torch_data.DistributedSampler(test_set, self.world_size, self.rank)
-        dataloader = DataLoader(test_set, self.batch_size, sampler=sampler, num_workers=self.num_worker)
+        dataloader = DataLoader(test_set, self.batch_size, sampler=sampler,
+                                num_workers=self.num_worker, follow_batch=self.follow_batch)
 
         model = self.model
         model.eval()
