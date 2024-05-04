@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 
 setup(
     name='exper',
-    version='0.1.4',
+    version='0.2.0',
     author="Mrzz",
     description="This is a python package for running deep learning experiments. "
                 "Users can rapidly run their experiments by importing this module.",
