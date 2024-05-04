@@ -15,11 +15,8 @@ extend-ignore = ["E731"]
 lines-after-imports = 2
 
 
-
 [tool.pyright]
-
 typeCheckingMode = "standard"
-
 pythonVersion = "3.12"
 pythonPlatform = "Linux"
 
@@ -32,24 +29,5 @@ reportPropertyTypeMismatch = true
 reportUntypedNamedTuple = true
 reportUnusedImport = true
 disableBytesTypePromotions = true
-
-# disable subset of "basic"
-# reportUntypedFunctionDecorator = false
-# reportUntypedClassDecorator = false
-# reportArgumentType = false
-# reportAssignmentType = false
 reportAttributeAccessIssue = false
 reportCallIssue = false
-# reportGeneralTypeIssues = false
-# reportIndexIssue = false
-# reportOperatorIssue = false
-# reportOptionalCall = false
-# reportOptionalIterable = false
-# reportOptionalMemberAccess = false
-# reportOptionalOperand = false
-# reportOptionalSubscript = false
-# reportPrivateImportUsage = false
-# reportRedeclaration = false
-# reportReturnType = false
-# reportUnboundVariable = false
-# reportMissingModuleSource = false
