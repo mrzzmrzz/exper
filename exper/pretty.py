@@ -1,7 +1,11 @@
+from typing import Sequence
+
+
 separator = ">" * 30
 line = "-" * 30
 
-def time(seconds):
+
+def time(seconds: float) -> str:
     """
     Format time as a string.
 
@@ -22,15 +26,17 @@ def time(seconds):
         return "%.2f secs" % seconds
 
 
-def long_array(array, truncation=10, display=3):
+def long_array[T](array: Sequence[T], truncation: int = 10, display: int = 3) -> str:
     """
     Format an array as a string.
 
     Parameters:
         array (array_like): array-like data
-        truncation (int, optional): truncate array if its length exceeds this threshold
-        display (int, optional): number of elements to display at the beginning and the end in truncated mode
+        truncation (int): truncate array if its length exceeds this threshold
+        display (int): number of elements to display at the beginning and the end in truncated mode
     """
     if len(array) <= truncation:
         return "%s" % array
     return "%s, ..., %s" % (str(array[:display])[:-1], str(array[-display:])[1:])
+
+

@@ -1,16 +1,17 @@
-import os
 import multiprocessing
+import os
 from collections import defaultdict
 
 import torch
 from torch import distributed as dist
+from torch.distributed.distributed_c10d import Work
 
 
 cpu_group = None
 gpu_group = None
 
 
-def get_rank():
+def get_rank() -> int:
     """
     Get the rank of this process in distributed processes.
 
@@ -23,7 +24,7 @@ def get_rank():
     return 0
 
 
-def get_world_size():
+def get_world_size() -> int:
     """
     Get the total number of distributed processes.
 
@@ -36,7 +37,7 @@ def get_world_size():
     return 1
 
 
-def get_group(device):
+def get_group(device: torch.device):
     """
     Get the process group corresponding to the given device.
 
@@ -45,12 +46,14 @@ def get_group(device):
     """
     group = cpu_group if device.type == "cpu" else gpu_group
     if group is None:
-        raise ValueError("%s group is not initialized. Use comm.init_process_group() to initialize it"
-                         % device.type.upper())
+        raise ValueError(
+            "%s group is not initialized. Use comm.init_process_group() to initialize it"
+            % device.type.upper()
+        )
     return group
 
 
-def init_process_group(backend, init_method=None, **kwargs):
+def init_process_group(backend: str, init_method: str | None, **kwargs) -> None:
     """
     Initialize CPU and/or GPU process groups.
 
@@ -69,14 +72,14 @@ def init_process_group(backend, init_method=None, **kwargs):
     cpu_group = gpu_group
 
 
-def get_cpu_count():
+def get_cpu_count() -> int:
     """
     Get the number of CPUs on this node.
     """
     return multiprocessing.cpu_count()
 
 
-def synchronize():
+def synchronize() -> None | Work | bool:
     """
     Synchronize among all distributed processes.
     """
@@ -84,9 +87,10 @@ def synchronize():
         dist.barrier()
 
 
-def _recursive_read(obj):
+def _recursive_read(obj) -> tuple[defaultdict, defaultdict]:
     values = defaultdict(list)
     sizes = defaultdict(list)
+
     if isinstance(obj, torch.Tensor):
         values[obj.dtype] += [obj.flatten()]
         sizes[obj.dtype] += [torch.tensor([obj.numel()], device=obj.device)]
@@ -137,7 +141,7 @@ def _recursive_write(obj, values, sizes=None):
     return new_obj, values
 
 
-def reduce(obj, op="sum", dst=None):
+def reduce(obj: object, op="sum", dst: int | None = None):
     """
     Reduce any nested container of tensors.
 
@@ -244,7 +248,7 @@ def cat(obj, dst=None):
     sizes = stack(sizes)
     cated = {}
     for k, value in values.items():
-        size = sizes[k].t().flatten() # sizes[k]: (num_worker, num_obj)
+        size = sizes[k].t().flatten()  # sizes[k]: (num_worker, num_obj)
         dtype = value[0].dtype
         # NCCL can't solve bool. Cast them to byte
         if dtype == torch.bool:
@@ -255,8 +259,8 @@ def cat(obj, dst=None):
         offset = size[:obj_id].sum()
         for v in value:
             assert offset + v.numel() <= len(s)
-            s[offset: offset + v.numel()] = v
-            offset += size[obj_id: obj_id + world_size].sum()
+            s[offset : offset + v.numel()] = v
+            offset += size[obj_id : obj_id + world_size].sum()
             obj_id += world_size
         group = get_group(s.device)
         if dst is None:
