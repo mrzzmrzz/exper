@@ -97,7 +97,7 @@ class Meter(object):
         log_interval: int = 100,
         silent: bool = False,
     ) -> None:
-        
+
         self.records = defaultdict(list)
         self.log_interval = log_interval
         self.epoch2batch = [0]
@@ -196,7 +196,7 @@ class Meter(object):
             record[k] = np.mean(v[index])
         self.log(record, category="train/epoch")
 
-    def __call__(self, num_epoch):
+    def __call__(self, num_epoch: int):
         self.start_epoch = self.epoch_id
         self.end_epoch = self.start_epoch + num_epoch
 
