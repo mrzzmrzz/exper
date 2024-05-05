@@ -14,7 +14,6 @@ extend-ignore = ["E731"]
 [tool.ruff.lint.isort]
 lines-after-imports = 2
 
-
 [tool.pyright]
 typeCheckingMode = "standard"
 pythonVersion = "3.12"
