@@ -12,6 +12,9 @@ exper.egg-info/
 /.idea/
 *.iml
 
+# VSCode Specific Files
+.vscode
+
 # Jupyter Notebook Checkpoints
 .ipynb_checkpoints/
 
