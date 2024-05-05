@@ -1,3 +1,4 @@
+# Some Python Files
 *.py[cod]
 *.log
 *.pot
@@ -14,7 +15,6 @@ exper.egg-info/
 
 # VSCode Specific Files
 .vscode
-
 
 # Jupyter Notebook Checkpoints
 .ipynb_checkpoints/
