@@ -20,6 +20,7 @@ typeCheckingMode = "standard"
 pythonVersion = "3.12"
 pythonPlatform = "Linux"
 
+reportAttributeAccessIssue = false
 # enable subset of "strict"
 reportDuplicateImport = true
 reportInconsistentConstructor = true
@@ -29,5 +30,4 @@ reportPropertyTypeMismatch = true
 reportUntypedNamedTuple = true
 reportUnusedImport = true
 disableBytesTypePromotions = true
-reportAttributeAccessIssue = false
 reportCallIssue = false
